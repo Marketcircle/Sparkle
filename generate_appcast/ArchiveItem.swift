@@ -157,8 +157,6 @@ class ArchiveItem: CustomStringConvertible {
 
             print("Unzip result", unzipResult)
 
-            //let payloadPath = findFile(path: pathOfPKGContent, filename: "Payload")
-
             //there can be more than one payload
             let payloadPaths = findFiles(path: pathOfPKGContent, filename: "Payload")
             print("Payload Paths", payloadPaths)
@@ -167,15 +165,15 @@ class ArchiveItem: CustomStringConvertible {
             var appPath:URL? = nil;
             for aPayloadPath in payloadPaths {
 
-                let pathOfPKGContentb = unarchivedDir.appendingPathComponent("PKGContent" +  UUID().uuidString, isDirectory:true).path
+                let pathOfPKGContentUnique = unarchivedDir.appendingPathComponent("PKGContent" +  UUID().uuidString, isDirectory:true).path
                 do {
-                    try fileManager.createDirectory(atPath: pathOfPKGContentb, withIntermediateDirectories: true, attributes: nil)
+                    try fileManager.createDirectory(atPath: pathOfPKGContentUnique, withIntermediateDirectories: true, attributes: nil)
                 }
                 catch let error as NSError {
                     print("Ooops! Something went wrong: \(error)")
                 }
 
-                let newPayloadPath = aPayloadPath //+ UUID().uuidString
+                let newPayloadPath = aPayloadPath + UUID().uuidString
                 print("Payload Path", newPayloadPath)
 
                 do {
@@ -186,10 +184,10 @@ class ArchiveItem: CustomStringConvertible {
 
                 }
 
-                let unpackagePKG = shellFromString("(cd " + pathOfPKGContentb + " && cat " + newPayloadPath + " | gunzip -dc | cpio -i)")
+                let unpackagePKG = shellFromString("(cd " + pathOfPKGContentUnique + " && cat " + newPayloadPath + " | gunzip -dc | cpio -i)")
                 print("UPKG",newPayloadPath)
 
-                let pathToInfoPlist = findFile(path: pathOfPKGContentb, filename: "Info.plist")
+                let pathToInfoPlist = findFile(path: pathOfPKGContentUnique, filename: "Info.plist")
 
                 appPath = apps[0];
                 guard let infoPlist = NSDictionary(contentsOf: URL(fileURLWithPath: pathToInfoPlist)) else {
