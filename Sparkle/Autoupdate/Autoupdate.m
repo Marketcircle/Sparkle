@@ -132,11 +132,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         exit(EXIT_FAILURE);
     }
     
+    /*
+         For some reason, the UI is not updating. It could be an SDK issue
+         or something like needing to enable drawing layers or concurrently
+         
+         We opened an issue with the main project:
+         https://github.com/sparkle-project/Sparkle/issues/1402
+         
+         Until we get some resolution, we set the progress value to 0, which actually makes it look full
+     */
     if (self.shouldShowUI && [installer canInstallSilently]) {
         self.statusController = [[SUStatusController alloc] initWithHost:host];
         [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
-                                   maxProgressValue:100 statusText: @""];
+                                   maxProgressValue:0 statusText: @""];
         [self.statusController showWindow:self];
     }
     
