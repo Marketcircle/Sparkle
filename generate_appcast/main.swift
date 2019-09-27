@@ -71,6 +71,8 @@ func main() {
     
     var privateDSAKey: SecKey? = nil;
     var privateEdString: String? = nil;
+    var specifiedReleaseNotesFileName: String? = nil;
+    var specifiedFileURL: String? = nil;
 
     // this was typical usage for DSA keys
     if args.count == 3 || (args.count == 4 && args[1] == "-f") {
@@ -120,11 +122,25 @@ func main() {
     else if args.count == 4 && args[1] == "-s" {
         privateEdString = args[2]
     }
-    else if args.count != 2 {
+    else {
+
+        if args.contains("-u") {
+            print("Found URL Argument")
+            specifiedFileURL = args[args.index(args.firstIndex(of: "-u")!, offsetBy: 1)]
+        }
+        
+        if args.contains("-r"){
+            print("Found Release Note Argument")
+            specifiedReleaseNotesFileName = args[args.index(args.firstIndex(of: "-r")!, offsetBy: 1)]
+        }
+
+    }
+
+    else if args.count != 3 {
         printUsage()
         exit(1)
     }
-    
+
     let archivesSourceDir = URL(fileURLWithPath: args.last!, isDirectory: true)
     let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
@@ -133,7 +149,7 @@ func main() {
         
         for (appcastFile, updates) in allUpdates {
             let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir);
-            try writeAppcast(appcastDestPath:appcastDestPath, updates:updates);
+            try writeAppcast(appcastDestPath:appcastDestPath, releaseFileNameString:specifiedReleaseNotesFileName!, updates:updates);
             print("Written", appcastDestPath.path, "based on", updates.count, "updates");
         }
     } catch {

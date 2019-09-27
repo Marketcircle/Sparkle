@@ -32,7 +32,7 @@ func text(_ text: String) -> XMLNode {
 }
 
 
-func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
+func writeAppcast(appcastDestPath: URL, releaseFileNameString: String, webURLString: String, updates: [ArchiveItem]) throws {
     let appBaseName = updates[0].appPath.deletingPathExtension().lastPathComponent;
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle";
@@ -110,7 +110,14 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         minVer?.setChildren([text(update.minimumSystemVersion)]);
 
         let relElement = findElement(name: SUAppcastElementReleaseNotesLink, parent: item);
-        if let url = update.releaseNotesURL {
+        
+        let specifiedReleaseNotesFileName = releaseFileNameString
+        
+        let releaseBaseLink = "https://www.marketcircle.com/appcasts/release-notes/"
+        let releaseNotesFileName = specifiedReleaseNotesFileName
+        let finalReleaseLink = URL(string: releaseBaseLink + releaseNotesFileName)
+        
+        if let url = finalReleaseLink {
             if nil == relElement {
                 item.addChild(XMLElement.element(withName: SUAppcastElementReleaseNotesLink, stringValue: url.absoluteString) as! XMLElement);
             }
